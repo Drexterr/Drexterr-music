@@ -20,7 +20,7 @@ const home = () => {
       <div className='bg-emerald-300 opacity-65 backdrop-blur-3xl h-2/3 my-6 rounded-3xl w-full'>
       Songs
        
-      {track.tracks.items.slice(0,12).map((items, index) => (
+      {track.tracks.items.slice(0,1).map((items, index) => (
         
 
 <div key= {index}className='grid grid-cols-[60px_1fr]'>
