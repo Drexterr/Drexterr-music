@@ -7,7 +7,7 @@ const Navbar = () => {
   const [token, setToken] = useState(null)
   const [searchQuery, setSearchQuery] = useState('');
 
-  const clientId = "1f38542e158f4fd3badf5309236a992e"; 
+  const clientId = import.meta.env.VITE_CLIENT_ID;
   const redirectUrl = 'http://localhost:5173/callback'; 
   const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=token&redirect_uri=${encodeURIComponent(redirectUrl)}&scope=user-read-private`;
   
