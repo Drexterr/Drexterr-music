@@ -12,7 +12,7 @@ const Navbar = () => {
   const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=token&redirect_uri=${encodeURIComponent(redirectUrl)}&scope=user-read-private`;
   
   
-  const {setTrack} = useContext(Trackcontext)
+  const {setTrack, setArtist} = useContext(Trackcontext)
   
 
   const handleclick = ()=>{
@@ -39,8 +39,14 @@ const Navbar = () => {
       return;
     }
     try {
+      const trackresponse = await fetch( `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=artist&limit=5`,
+    {
+       headers: {
+        Authorization: `Bearer ${token}`,
+      },
+}) ;
       const response = await fetch(
-        `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track`,
+        `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=5`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -48,20 +54,25 @@ const Navbar = () => {
         }
       );
       if (!response.ok) {
-        const errorText = await response.text(); 
-        console.error('Response Status:', response.status);
+        const errorText = await (response.text() || trackresponse.text); 
+        console.error('Response Status:', response.status || trackresponse.status);
         console.error('Raw Error Response:', errorText);
         throw new Error(`HTTP ${response.status}: ${errorText}`);
       }
-      const data = await response.json();
+      const data = await response.json() ;
+      const Artistdata = await trackresponse.json() ;
       
       setTrack(data);
-      return data;
-    } catch (error) {
+      setArtist(Artistdata);
+      return Artistdata, data;
+      
+
+    }catch (error) {
       console.error('Error fetching data:', error.message);
     }
   };
       
+
 
   const handleSearch = (e) => {
     e.preventDefault();
@@ -71,8 +82,8 @@ const Navbar = () => {
   };
   return (
     <div className="px-4 py-2 flex justify-between items-center">
-<div className='flex items-center gap-3 text-2xl text-white font-bold'>
-      <div className="h-12 w-12 border-2 border-white rounded-full ">
+<div className='flex items-center gap-3 text-2xl text-white/80 font-bold'>
+      <div className="h-12 w-12 border-2 border-white/80 rounded-full ">
         <img className="p-1 "  src={Logo} alt="Drexterr Music Logo" />
         
       </div>DREXTERr Music
@@ -82,7 +93,7 @@ const Navbar = () => {
        
           <form onSubmit={handleSearch} className="flex gap-2">
             <input
-              className="border-2 border-cyan-200 px-6 py-2 rounded-2xl focus:outline-none"
+              className="border-2 border-white/80 text-white px-6 py-2 rounded-2xl focus:outline-none"
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -90,14 +101,14 @@ const Navbar = () => {
             />
             <button
               type="submit"
-              className="px-4 py-2 bg-cyan-600 text-white rounded-2xl hover:bg-cyan-700"
+              className="px-4 py-2 bg-white/30 text-white rounded-2xl hover:bg-black/30"
             >
               Search
             </button>
           </form>
           
       </div>
-      <button type='submit' className='px-4 py-2 bg-cyan-600 text-white rounded-2xl hover:bg-cyan-700' onClick={handleclick}>Login</button>
+      <button type='submit' className='px-4 py-2 bg-white/30 text-white rounded-2xl hover:bg-black/30' onClick={handleclick}>Login</button>
     </div>
   );
 };

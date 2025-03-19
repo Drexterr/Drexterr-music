@@ -4,10 +4,11 @@ import Trackcontext from "./Trackcontext";
 const Trackcontextprovider = ({children})=>{
 
     const [track, setTrack] = useState("")
+    const [artist, setArtist] = useState("")
 
 return (
    
-<Trackcontext.Provider value = {{track, setTrack}}>
+<Trackcontext.Provider value = {{track, setTrack, artist, setArtist}}>
 
 
 {children}
