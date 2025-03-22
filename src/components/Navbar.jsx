@@ -4,7 +4,7 @@ import Trackcontext from '../context/Trackcontext';
 
 
 const Navbar = () => {
-  const [token, setToken] = useState(null)
+  
   const [searchQuery, setSearchQuery] = useState('');
 
   const clientId = import.meta.env.VITE_CLIENT_ID;
@@ -12,14 +12,16 @@ const Navbar = () => {
   const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=token&redirect_uri=${encodeURIComponent(redirectUrl)}&scope=user-read-private`;
   
   
-  const {setTrack, setArtist} = useContext(Trackcontext)
+  const {setTrack, setArtist, setAlbum, token, setToken, setUserdata, userdata} = useContext(Trackcontext)
   
 
-  const handleclick = ()=>{
+  const handleclick =  ()=>{
     console.log('Auth URL:', authUrl);
-    window.location = authUrl;}
+    window.location = authUrl;
+  
+  }
 
-
+  
   useEffect(() => {
     const hash = window.location.hash;
     if (hash){
@@ -31,43 +33,71 @@ const Navbar = () => {
       window.location.hash = ''; 
       setToken(token);
       console.log('Access Token:', token);
+
+      const duser = async () => {
+
+        const user = await fetch (`https://api.spotify.com/v1/me`,
+          {
+         headers: {
+           Authorization: `Bearer ${token}`,
+         },
+       }
+      
+       );
+       const datauser = await user.json();
+       
+       setUserdata(datauser);
+       return ;
+      }
+      duser();
     }
   }, [])
+
+  
+
   const searchSpotify = async (query) => {
     if (!token) {
       console.error('No token available');
       return;
     }
     try {
-      const trackresponse = await fetch( `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=artist&limit=5`,
+      
+      const albumresponse = await fetch (`https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=album&limit=10`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const trackresponse = await fetch( `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=artist&limit=10`,
     {
        headers: {
         Authorization: `Bearer ${token}`,
       },
 }) ;
       const response = await fetch(
-        `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=5`,
+        `https://api.spotify.com/v1/search?q=${encodeURIComponent(query)}&type=track&limit=10`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       );
-      if (!response.ok) {
-        const errorText = await (response.text() || trackresponse.text); 
-        console.error('Response Status:', response.status || trackresponse.status);
+      if (!response.ok ) {
+        const errorText = await (response.text() || trackresponse.text || albumresponse.text); 
+        console.error('Response Status:', response.status || trackresponse.status || albumresponse.status);
         console.error('Raw Error Response:', errorText);
         throw new Error(`HTTP ${response.status}: ${errorText}`);
       }
       const data = await response.json() ;
       const Artistdata = await trackresponse.json() ;
+      const Albumdata = await albumresponse.json() ;
       
       setTrack(data);
       setArtist(Artistdata);
-      return Artistdata, data;
-      
-
-    }catch (error) {
+      setAlbum(Albumdata);
+      return Artistdata, data, Albumdata;
+    }
+    catch (error) {
       console.error('Error fetching data:', error.message);
     }
   };
@@ -80,6 +110,8 @@ const Navbar = () => {
       searchSpotify(searchQuery, token);
     }
   };
+  
+/* console.log(userdata); */
   return (
     <div className="px-4 py-2 flex justify-between items-center">
 <div className='flex items-center gap-3 text-2xl text-white/80 font-bold'>
@@ -108,7 +140,7 @@ const Navbar = () => {
           </form>
           
       </div>
-      <button type='submit' className='px-4 py-2 bg-white/30 text-white rounded-2xl hover:bg-black/30' onClick={handleclick}>Login</button>
+      <button type='submit' className='px-4 py-2 bg-white/30 text-white rounded-2xl hover:bg-black/30' onClick={handleclick} >Login</button>
     </div>
   );
 };
