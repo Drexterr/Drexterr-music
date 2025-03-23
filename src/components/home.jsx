@@ -1,14 +1,21 @@
 import React, { useContext, useEffect } from 'react'
 import Trackcontext from '../context/Trackcontext'
+import { useNavigate } from 'react-router';
 
 const home = () => {
-  const { track, artist, album, token, newrelease, setNewrelease, severalalbums, setSeveralalbums} = useContext(Trackcontext)
+  const { track, artist, album, token, newrelease, setNewrelease, severalalbums, setSeveralalbums, severaltrack, setSeveraltrack, setId} = useContext(Trackcontext)
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchnewrelease = async () => {
       if (!token) return;
 
       try {
+        const severaltrackresponse = await fetch (`https://api.spotify.com/v1/tracks?market=IN&ids=1SKPmfSYaPsETbRHaiA18G`,{
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
 
         const severalalbumsresponse = await fetch (`https://api.spotify.com/v1/albums?ids=5KF4xCxDD8ip003hoatFT9,2Lxoc72vRTGdQfMvj7Ovi1,3BGU0BqGwBkYDHpfCWFm7I,3OxfaVgvTxUTy7276t7SPU,4OYdTHNgjhXzgVjbqsb0tO,0upenH0uUT36nBbVM5mQhW,7vpQCYM9kT9jhKa2MEzZSl,7w80tk12K6vKuXC7MriUIh`,{
           headers: {
@@ -23,6 +30,7 @@ const home = () => {
         });
         const releasedata = await releaseresponse.json();
         const severalalbumsdata = await severalalbumsresponse.json();
+        const severaltrackdata = await severaltrackresponse.json();
 
         if (!releaseresponse.ok || !releasedata.length === 0) {
 
@@ -31,13 +39,15 @@ const home = () => {
 
         setSeveralalbums(severalalbumsdata);
         setNewrelease(releasedata);
+        setSeveraltrack(severaltrackdata);
         console.log(releasedata);
         console.log(severalalbumsdata);
+        console.log(severaltrackdata);
       } catch (error) {
         console.error('Error fetching New Releases:', error.message);
       }
     }; fetchnewrelease();
-  }, [token, setNewrelease, setSeveralalbums]);
+  }, [token, setNewrelease, setSeveralalbums, setSeveraltrack]);
 
   if (!track || !track.tracks || !track.tracks.items || track.tracks.items.length === 0 ) {
 
@@ -51,23 +61,41 @@ const home = () => {
     );
   }
   else{
-    return(
-      <div className='backdrop-blur-md bg-white/30 my-6 rounded-3xl w-3/4 p-4 max-h-[620px] '>
-        <div className='flex flex-row gap-4 overflow-x-auto pb-2  mt-2 scrollbar-hidden  items-start '>
+
+    const handleid = (item, album, track)=>{
+      const id = item.id || album.id || track.id;
+      console.log(id);
+      setId(id);
+      navigate(`/infopage/${id}`);
+
+    }
+    
+    return( 
+      <div className='backdrop-blur-md bg-white/30 my-6 rounded-3xl w-3/4 p-4 max-h-[620px] overflow-y-scroll scrollbar-hidden'>
+        <div className='flex flex-row gap-4 overflow-x-auto pb-2  mt-2 scrollbar-hidden  items-start border-b-2 shadow-2xl border-white/30'>
         <p className='font-black vertical-text text-3xl'>NEW RELEASES</p>
-        {newrelease.albums.items.map((items, index) => (
-          <div key={index} className='flex-shrink-0 snap-start min-h-fit w-52  hover:bg-white/30 hover:rounded-4xl justify-self-center'>
-          <img className='rounded-full object-cover h-40 w-40 shadow-2xl justify-self-center' src={items.images[0]?.url || items.images[2]?.url} alt={items.name} />
-          <div className='justify-self-center font-medium text-xl'>{items.name}</div>
+        {newrelease.albums.items.map((item, index) => (
+          <div key={index}  onClick={() =>handleid(item)} className='flex-shrink-0 snap-start min-h-fit w-52  hover:bg-white/30 hover:rounded-4xl justify-self-center'>
+          <img className='rounded-full object-cover h-40 w-40 shadow-2xl justify-self-center' src={item.images[0]?.url || item.images[2]?.url} alt={item.name} />
+          <div className='justify-self-center font-medium text-xl'>{item.name}</div>
         </div>
         ))}
 </div>
-<div className='flex flex-row gap-4 overflow-x-auto pb-2   mt-10 scrollbar-hidden items-start   '>
+<div className='flex flex-row gap-4 overflow-x-auto pb-2   mt-10 scrollbar-hidden items-start   border-b-2 shadow-2xl border-white/30'>
         <p className='font-black vertical-text text-3xl'>TOP ALBUMS</p>
-        {severalalbums.albums.map((albums, index) => (
-          <div key={index} className='flex-shrink-0 snap-start min-h-fit w-52  hover:bg-white/30 hover:rounded-4xl justify-self-center'>
-          <img className='rounded-full object-cover h-40 w-40 shadow-2xl justify-self-center' src={albums.images[0]?.url || albums.images[2]?.url} alt={albums.name} />
-          <div className='justify-self-center font-medium text-xl'>{albums.name}</div>
+        {severalalbums.albums.map((album, index) => (
+          <div key={index} onClick={() =>handleid(album)} className='flex-shrink-0 snap-start min-h-fit w-52  hover:bg-white/30 hover:rounded-4xl justify-self-center'>
+          <img className='rounded-full object-cover h-40 w-40 shadow-2xl justify-self-center' src={album.images[0]?.url || album.images[2]?.url} alt={album.name} />
+          <div className='justify-self-center font-medium text-xl'>{album.name}</div>
+        </div>
+        ))}
+</div>
+<div className='flex flex-row gap-4 overflow-x-auto pb-2   mt-10 scrollbar-hidden items-start   border-b-2 shadow-2xl border-white/30'>
+        <p className='font-black vertical-text text-3xl'>TOP TRACKS</p>
+        {severaltrack.tracks.map((track, index) => (
+          <div key={index} onClick={() =>handleid(track)} className='flex-shrink-0 snap-start min-h-fit w-52  hover:bg-white/30 hover:rounded-4xl justify-self-center'>
+          <img className='rounded-full object-cover h-40 w-40 shadow-2xl justify-self-center' src={track.album.images[1]?.url || track.album.images[2]?.url} alt={track.album.name} />
+          <div className='justify-self-center font-medium text-xl'>{track.album.name}</div>
         </div>
         ))}
 </div>
@@ -94,18 +122,18 @@ const home = () => {
 
     <div className='backdrop-blur-md bg-white/30 my-6 rounded-3xl w-full p-4 max-h-[620px] overflow-y-scroll scrollbar-hidden'>
       <div className='grid grid-rows-[auto_auto_auto] max-h-screen gap-5'>
-        <div className='grid-cols-2 grid gap-2 max-h-[40vh]'>
+        <div className='grid-cols-2 grid gap-2 max-h-[40vh] border-b-2 shadow-2xl border-white/30'>
           <div className='overflow-y-scroll scrollbar-hidden'>
-            {track.tracks.items.map((items, index) => (
+            {track.tracks.items.map((item, index) => (
               <div key={index} className='grid grid-cols-[60px_1fr_60px] gap-1 mt-2 hover:bg-white/30'>
-                <div className='h-12 w-12'> <img src={items.album.images[0].url} alt={items.name} /></div>
+                <div onClick={() =>handleid(item)} className='h-12 w-12'> <img src={item.album.images[0].url} alt={item.name} /></div>
                 <div>
                   <div className='font-medium'>
-                    {items.name}
+                    {item.name}
                   </div>
-                  <div>{items.album.artists[0].name}</div>
+                  <div>{item.album.artists[0].name}</div>
                 </div>
-                <div> {duration(items.duration_ms)}</div>
+                <div> {duration(item.duration_ms)}</div>
               </div>
             ))}
           </div>
@@ -113,28 +141,28 @@ const home = () => {
             <div><h2 className='font-black vertical-text text-4xl pr-4 pb-4'>TOP RESULT</h2></div>
             <div>
               <img className='rounded-4xl h-50' src={track.tracks.items[0].album.images[1].url} alt="" />
-              <div> <h2 className='font-semibold mt-3'>{track.tracks.items[0].name}</h2></div>
+              <div > <h2 className='font-semibold mt-3'>{track.tracks.items[0].name}</h2></div>
               <div>{track.tracks.items[0].album.artists[0].name}</div>
             </div>
           </div>
         </div>
 
-        <div className='flex flex-row gap-4 overflow-x-auto pb-2 snap-x snap-mandatory mt-2 scrollbar-hidden items-center  max-h-[40vh]'>
+        <div className='flex flex-row gap-4 overflow-x-auto pb-2  snap-mandatory mt-2 scrollbar-hidden items-center   border-b-2 shadow-2xl border-white/30  h-fit'>
           <p className='font-black vertical-text text-4xl'>TOP ARTISTS</p>
-          {artist.artists.items.map((items, index) => (
-            <div key={index} className='flex-shrink-0 snap-start min-h-fit w-52  hover:bg-white/30 hover:rounded-4xl justify-self-center'>
-              <img className='rounded-full object-cover h-40 w-40 shadow-2xl justify-self-center' src={items.images[1]?.url || items.images[2]?.url} alt={items.name} />
-              <div className='justify-self-center font-medium text-xl'>{items.name}</div>
+          {artist.artists.items.map((item, index) => (
+            <div key={index} onClick={() =>handleid(item)} className='flex-shrink-0 snap-start min-h-fit w-52  hover:bg-white/30 hover:rounded-4xl justify-self-center'>
+              <img className='rounded-full object-cover h-40 w-40 shadow-2xl justify-self-center' src={item.images[1]?.url || item.images[2]?.url} alt={item.name} />
+              <div className='justify-self-center font-medium text-xl'>{item.name}</div>
 
             </div>
           ))}
         </div>
-        <div className=' flex flex-row gap-4 overflow-x-auto pb-2 snap-x snap-mandatory mt-2 scrollbar-hidden items-center '>
+        <div className=' flex flex-row gap-4 overflow-x-auto pb-2  snap-mandatory  scrollbar-hidden items-start   border-b-2 shadow-2xl border-white/30 h-fit mt-28'>
           <p className='font-black vertical-text text-4xl'>TOP ALBUMS</p>
-          {album.albums.items.map((items, index) => (
-            <div key={index} className='flex-shrink-0 snap-start min-h-fit w-52  hover:bg-white/30 hover:rounded-4xl justify-self-center'>
-              <img className='rounded-full object-cover h-40 w-40 shadow-2xl justify-self-center' src={items.images[1]?.url || items.images[2]?.url} alt={items.name} />
-              <div className='justify-self-center font-medium text-xl'>{items.name}</div>
+          {album.albums.items.map((item, index) => (
+            <div key={index} onClick={() =>handleid(item)} className='flex-shrink-0 snap-start min-h-fit w-52  hover:bg-white/30 hover:rounded-4xl justify-self-center'>
+              <img className='rounded-full object-cover h-40 w-40 shadow-2xl justify-self-center' src={item.images[1]?.url || item.images[2]?.url} alt={item.name} />
+              <div className='justify-self-center font-medium text-xl'>{item.name}</div>
 
             </div>
           ))}
