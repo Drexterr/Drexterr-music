@@ -3,7 +3,7 @@ import Trackcontext from '../context/Trackcontext'
 import { useNavigate } from 'react-router';
 
 const home = () => {
-  const { track, artist, album, token, newrelease, setNewrelease, severalalbums, setSeveralalbums, severaltrack, setSeveraltrack, setId} = useContext(Trackcontext)
+  const { track, artist, album, token, setType , newrelease, setNewrelease, severalalbums, setSeveralalbums, severaltrack, setSeveraltrack, setId} = useContext(Trackcontext)
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -64,7 +64,10 @@ const home = () => {
 
     const handleid = (item, album, track)=>{
       const id = item.id || album.id || track.id;
+      const type = item.type || album.type || track.type;
       console.log(id);
+      console.log(type);
+      setType(type);
       setId(id);
       navigate(`/infopage/${id}`);
 

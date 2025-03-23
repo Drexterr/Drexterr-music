@@ -12,11 +12,13 @@ const Trackcontextprovider = ({children})=>{
     const [album, setAlbum] = useState("")
     const [severaltrack, setSeveraltrack] = useState("")
     const [id, setId] = useState("")
+    const [type, setType]= useState("")
 
 
 return (
    
-<Trackcontext.Provider value = {{track, setTrack, artist, setArtist, severaltrack, setSeveraltrack, album, setAlbum, token, setToken, newrelease, setNewrelease, userdata, setUserdata, severalalbums, setSeveralalbums, id, setId}}>
+<Trackcontext.Provider value = {{track, setTrack, artist, setArtist, severaltrack, setSeveraltrack, album, setAlbum, token, 
+    setToken, newrelease, setNewrelease, userdata, type, setType, setUserdata, severalalbums, setSeveralalbums, id, setId}}>
 
 
 {children}
