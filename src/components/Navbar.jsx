@@ -8,7 +8,7 @@ const Navbar = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const clientId = import.meta.env.VITE_CLIENT_ID;
-  const redirectUrl = 'http://localhost:5173/Callback' || 'https://drexterrmusic.netlify.app/Callback'; 
+  const redirectUrl = 'https://drexterrmusic.netlify.app/Callback'  || 'http://localhost:5173/Callback'; 
   const authUrl = `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=token&redirect_uri=${encodeURIComponent(redirectUrl)}&scope=user-read-private`;
   
   
