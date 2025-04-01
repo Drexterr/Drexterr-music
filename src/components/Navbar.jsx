@@ -1,5 +1,5 @@
 import React, {useState, useEffect, useContext} from 'react'
-import Logo from '/Users/Bharat/OneDrive/Desktop/Project/Drexterr Music/Drexterr music/src/img/logo.png'
+import Logo from '../img/logo.png'
 import Trackcontext from '../context/Trackcontext';
 
 
