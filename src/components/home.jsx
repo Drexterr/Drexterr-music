@@ -11,7 +11,7 @@ const home = () => {
       if (!token) return;
 
       try {
-        const severaltrackresponse = await fetch (`https://api.spotify.com/v1/tracks?market=IN&ids=1SKPmfSYaPsETbRHaiA18G`,{
+        const severaltrackresponse = await fetch (`https://api.spotify.com/v1/tracks?market=IN&ids=1SKPmfSYaPsETbRHaiA18G,25jtUwCQfXwnxENh8Bvoj4,5XeFesFbtLpXzIVDNQP22n,3qhlB30KknSejmIvZZLjOD,1qDrWA6lyx8cLECdZE7TV7,3hRV0jL3vUpRrcy398teAU,6tNQ70jh4OwmPGpYy6R2o9,14AyWf6y7KlWWLfAjdKMKI`,{
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -80,7 +80,7 @@ const home = () => {
         {newrelease.albums.items.map((item, index) => (
           <div key={index}  onClick={() =>handleid(item)} className='flex-shrink-0 snap-start min-h-fit w-52  hover:bg-white/30 hover:rounded-4xl justify-self-center'>
           <img className='rounded-full object-cover h-40 w-40 shadow-2xl justify-self-center' src={item.images[0]?.url || item.images[2]?.url} alt={item.name} />
-          <div className='justify-self-center font-medium text-xl'>{item.name}</div>
+          <div className='justify-self-center font-medium text-xl text-center'>{item.name}</div>
         </div>
         ))}
 </div>
@@ -89,7 +89,7 @@ const home = () => {
         {severalalbums.albums.map((album, index) => (
           <div key={index} onClick={() =>handleid(album)} className='flex-shrink-0 snap-start min-h-fit w-52  hover:bg-white/30 hover:rounded-4xl justify-self-center'>
           <img className='rounded-full object-cover h-40 w-40 shadow-2xl justify-self-center' src={album.images[0]?.url || album.images[2]?.url} alt={album.name} />
-          <div className='justify-self-center font-medium text-xl'>{album.name}</div>
+          <div className='justify-self-center font-medium text-xl text-center'>{album.name}</div>
         </div>
         ))}
 </div>
@@ -98,7 +98,7 @@ const home = () => {
         {severaltrack.tracks.map((track, index) => (
           <div key={index} onClick={() =>handleid(track)} className='flex-shrink-0 snap-start min-h-fit w-52  hover:bg-white/30 hover:rounded-4xl justify-self-center'>
           <img className='rounded-full object-cover h-40 w-40 shadow-2xl justify-self-center' src={track.album.images[1]?.url || track.album.images[2]?.url} alt={track.album.name} />
-          <div className='justify-self-center font-medium text-xl'>{track.album.name}</div>
+          <div className='justify-self-center font-medium text-xl text-center'>{track.name}</div>
         </div>
         ))}
 </div>

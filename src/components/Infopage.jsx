@@ -5,6 +5,8 @@ const Infopage = () => {
 const [data, setdata] = useState("")
   const{id, type, token} = useContext(Trackcontext)
 
+  
+
   const duration = (duration_ms) => {
     const totaltime = Math.floor(duration_ms / 1000);
     const minutes = Math.floor(totaltime / 60);
@@ -29,7 +31,13 @@ useEffect(() => {
       Authorization: `Bearer ${token}`,
     },
   });
-  
+
+ 
+    const artistinfo = ()=>{
+    const artistid = data.album.artists[0].id
+    console.log(artistid);
+    }
+    
   }
   else if (type === "album"){
 
@@ -43,9 +51,10 @@ useEffect(() => {
   } else{
     throw new Error('Invalid type specified');
   }
-  
+
         const fetchedData = await response.json();
         setdata(fetchedData);
+       console.log(artistinfo)
         console.log(fetchedData)
   }
     catch{
@@ -56,7 +65,8 @@ useEffect(() => {
 fetchdata();
 }, [id, type, token])
 
-if(type === 'album' && data){
+
+if(type === 'album' && data ){
   return(
     <div className=' p-4 max-h-[620px] overflow-y-scroll scrollbar-hidden'>
     <div className='flex gap-4'>
@@ -76,10 +86,11 @@ if(type === 'album' && data){
 </div>
     <div className='text-base  font-serif text-white/80'>Popularity: {data.popularity}</div>
     <div className='text-base  font-serif text-white/80'>Released on: {data.release_date}</div>
+   
     </div>
     
     </div>
-    <div className='backdrop-blur-md bg-white/30  rounded-3xl w-full p-5 overflow-y-scroll'> 
+    <div className='backdrop-blur-md bg-white/30  rounded-3xl w-full p-5 overflow-y-scroll scrollbar-hidden'> 
     <div className='font-medium font-serif text-3xl border-b-2 border-white/30 pb-2 text-white/80 shadow-2xl'>{data.tracks.total} Tracks</div>
     <div>
       {data.tracks.items.map((item,index)=>(
@@ -104,8 +115,33 @@ if(type === 'album' && data){
     </div>
     </div>
     </div>
-  )}
+  )} 
+else if( type === 'track' && data){
+  return(  
+     <div className=' p-4 max-h-[620px] overflow-y-scroll scrollbar-hidden'>
+    <div className='flex gap-4'>
+      <div className='w-1/4 backdrop-blur-md bg-white/30 my-6 rounded-3xl'>
+<img className='p-5' src={data.album.images[1].url || data.album.images[0].url} alt={data.name} /></div>
+    <div className='w-3/4 backdrop-blur-md bg-white/30 my-6 rounded-3xl content-center p-5'> 
+    
+    <div className='text-7xl font-bold font-serif text-white/80'>{data.name} <span className='text-base font-medium font-serif'>{data.type} </span></div>
+    <div className=''></div>
+    <div className="font-bold font-serif mt-2 text-2xl text-white/80">
+  {data.artists.map((artist, index) => (
+    <span key={index}>
+      {artist.name}
+      {index < data.artists.length - 1 && <span>, </span>}
+    </span>
+  ))}
+</div>
+    <div className='text-base  font-serif text-white/80'>Popularity: {data.popularity}</div>
+    <div className='text-base  font-serif text-white/80'>Released on: {data.album.release_date}</div>
+    </div></div>
+    <div className='backdrop-blur-md bg-white/30  rounded-3xl w-full p-5 overflow-y-scroll scrollbar-hidden'> 
 
+    </div> </div>
+  )
+}
 
   
 }
